@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "test": "mocha -r ts-node/register tests/**/*.spec.ts",
+    "test:js": "mocha -r ts-node/register tests/**/*.spec.ts",
+    "test:sol": "yarn build && truffle test ./tests/contracts/merkle_with_contract_test.js",
+    "developnet": "truffle develop",
     "examples:ordered": "ts-node ./examples/ordered.ts",
     "examples:notordered": "ts-node ./examples/not_ordered.ts"
   },
@@ -15,6 +17,7 @@
     "web3-utils": "1.3.4"
   },
   "devDependencies": {
+    "truffle": "5.2.5",
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",

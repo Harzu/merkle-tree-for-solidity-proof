@@ -4,7 +4,6 @@ export function combinedHash(first: Buffer, second: Buffer, preserveOrder: boole
   if (!second) return first;
   if (!first) return second;
 
-  // @ts-ignore
   const buf = (preserveOrder) ? bufJoin(first, second) : bufSortJoin(first, second)
   // @ts-ignore
   return Buffer.from(hexToBytes(soliditySha3(encodePacked(buf))))
@@ -12,48 +11,38 @@ export function combinedHash(first: Buffer, second: Buffer, preserveOrder: boole
 
 export function getNextLayer(elements: Buffer[], preserveOrder: boolean): Buffer[] {
   return elements.reduce((layer, element, index, arr) => {
-    if (index % 2 == 0) {
-      layer.push(combinedHash(element, arr[index + 1], preserveOrder));
-    }
+    if (index % 2 == 0) layer.push(combinedHash(element, arr[index + 1], preserveOrder));
     return layer;
   }, []);
 }
 
 export function getLayers(elements: Buffer[], preserveOrder: boolean): Buffer[][] {
-  if (elements.length == 0) {
-    return [[]];
-  }
+  if (elements.length == 0) return [[]];
 
   const layers = [];
   layers.push(elements);
+
   while (layers[layers.length - 1].length > 1) {
     layers.push(getNextLayer(layers[layers.length - 1], preserveOrder));
   }
+
   return layers;
 }
 
 export function getProof(index: number, layers: Buffer[][], hex: boolean): Buffer[] | string[] {
   const proof = layers.reduce((proof, layer) => {
-    let pair = getPair(index, layer);
+    const pair = getPair(index, layer);
     if (pair) proof.push(pair);
     index = Math.floor(index / 2);
     return proof;
   }, []);
 
-  if (hex) {
-    return proof.map(e => '0x' + e.toString('hex'));
-  } else {
-    return proof;
-  }
+  return (hex) ? proof.map(e => '0x' + e.toString('hex')) : proof;
 }
 
 export function getPair(index: number, layer: Buffer[]): Buffer {
   let pairIndex = index % 2 ? index - 1 : index + 1;
-  if (pairIndex < layer.length) {
-    return layer[pairIndex];
-  } else {
-    return null;
-  }
+  return (pairIndex < layer.length) ? layer[pairIndex] : null;
 }
 
 export function getBufIndex(element: Buffer, array: Buffer[]): number {
@@ -62,6 +51,7 @@ export function getBufIndex(element: Buffer, array: Buffer[]): number {
       return i;
     }
   }
+
   return -1;
 }
 
@@ -78,7 +68,5 @@ export function bufSortJoin(first: Buffer, second: Buffer): Buffer {
 }
 
 export function bufDedup(buffers: Buffer[]): Buffer[] {
-  return buffers.filter((buffer, i) => {
-    return getBufIndex(buffer, buffers) == i;
-  });
+  return buffers.filter((buffer, i) => getBufIndex(buffer, buffers) == i);
 }

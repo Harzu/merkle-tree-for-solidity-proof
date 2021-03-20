@@ -1,8 +1,9 @@
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0;
 
-contract V {
-  function verifyProof(
-    bytes32[2] memory proof,
+contract MerkleProofValidator {
+  function verifyProofOrdered(
+    bytes32[] memory proof,
     bytes32 root,
     bytes32 leaf,
     uint index
@@ -27,7 +28,7 @@ contract V {
   }
 
   function verifyProof(
-    bytes32[4] memory proof,
+    bytes32[] memory proof,
     bytes32 root,
     bytes32 leaf
   )
